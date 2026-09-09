@@ -39,7 +39,7 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
         with:
-          terraform_version: 1.9.5   # ✅ Official action installs Terraform
+          terraform_version: 1.9.5
 
       - name: Validate Terraform
         run: |
@@ -65,4 +65,6 @@ jobs:
 
       - name: Deploy to EC2
         if: ${{ github.event.inputs.deploy == 'true' }}
-        run: terraform apply -auto-approve
+        run: |
+          cd terraform
+          terraform apply -auto-approve
