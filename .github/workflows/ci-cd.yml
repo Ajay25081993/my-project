@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4   # ✅ Updated to v4
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -32,10 +32,18 @@ jobs:
       - name: Run tests
         run: |
           if [ -d tests ]; then pytest || true; fi
-        # ✅ Added "|| true" so failing tests don’t kill the pipeline immediately
 
       - name: Build Docker image
         run: docker build -t my-app:latest .
+
+      - name: Install Terraform
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y wget unzip
+          wget https://releases.hashicorp.com/terraform/1.9.5/terraform_1.9.5_linux_amd64.zip
+          unzip terraform_1.9.5_linux_amd64.zip
+          sudo mv terraform /usr/local/bin/
+          terraform -version
 
       - name: Validate Terraform
         run: |
