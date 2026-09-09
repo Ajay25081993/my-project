@@ -1,0 +1,50 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Run tests
+        run: |
+          pip install -r requirements.txt
+          pytest
+
+      - name: Build Docker image
+        run: docker build -t my-app:latest .
+
+      - name: Validate Terraform
+        run: |
+          cd terraform
+          terraform init
+          terraform validate
+          terraform fmt -check
+
+      - name: Configure AWS credentials
+        if: github.event.inputs.deploy == 'true'
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-2
+
+      - name: Push to Amazon ECR
+        if: github.event.inputs.deploy == 'true'
+        run: |
+          aws ecr get-login-password --region ap-south-2 | docker login --username AWS --password-stdin 206482633930.dkr.ecr.ap-south-2.amazonaws.com
+          docker tag my-app:latest 206482633930.dkr.ecr.ap-south-2.amazonaws.com/my-app:latest
+          docker push 206482633930.dkr.ecr.ap-south-2.amazonaws.com/my-app:latest
+
+      - name: Deploy to EC2
+        if: github.event.inputs.deploy == 'true'
+        run: terraform apply -auto-approve
