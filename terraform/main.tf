@@ -3,7 +3,7 @@ provider "aws" {
 }
 
 resource "aws_security_group" "allow_flask" {
-  name        = "allow_flask"
+  name        = "allow_flask_app"   # ✅ renamed to avoid duplicate
   description = "Allow Flask app traffic"
   vpc_id      = var.vpc_id
 
@@ -45,4 +45,3 @@ resource "aws_instance" "my_ec2" {
     sudo docker run -d -p 5000:5000 $IMAGE_URI
   EOF
 }
-
