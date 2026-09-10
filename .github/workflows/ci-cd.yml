@@ -46,7 +46,7 @@ jobs:
           cd terraform
           terraform init -input=false
           terraform validate
-          terraform fmt -check
+          terraform fmt -recursive
 
       - name: Configure AWS credentials
         if: ${{ github.event.inputs.deploy == 'true' }}
