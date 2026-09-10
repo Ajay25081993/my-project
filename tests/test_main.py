@@ -1,4 +1,6 @@
-from app.main import handler
+from app.main import app
 
-def test_handler():
-    assert handler() == "Hello from my app!"
+def test_home():
+    client = app.test_client()
+    response = client.get("/")
+    assert response.data.decode() == "Hello from Python Docker App on AWS EC2!"
