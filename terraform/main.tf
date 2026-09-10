@@ -24,8 +24,8 @@ resource "aws_security_group" "allow_flask" {
 }
 
 resource "aws_instance" "my_ec2" {
-  ami           = "ami-0f684d40c1e7eee5c" # ✅ Valid Ubuntu AMI in ap-south-2
-  instance_type = "t3.micro"              # ✅ Free Tier eligible
+  ami           = "ami-0f684d40c1e7eee5c"
+  instance_type = "t3.micro"
   vpc_security_group_ids = [aws_security_group.allow_flask.id]
 
   user_data = <<-EOF
@@ -44,4 +44,9 @@ resource "aws_instance" "my_ec2" {
     sudo docker pull $IMAGE_URI
     sudo docker run -d -p 5000:5000 $IMAGE_URI
   EOF
+}
+
+output "ec2_public_ip" {
+  description = "Public IP of the EC2 instance"
+  value       = aws_instance.my_ec2.public_ip
 }
